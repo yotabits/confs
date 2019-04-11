@@ -16,8 +16,8 @@ HISTCONTROL=ignoreboth
 shopt -s histappend
 
 # for setting history length see HISTSIZE and HISTFILESIZE in bash(1)
-HISTSIZE=1000
-HISTFILESIZE=2000
+HISTSIZE=100000
+HISTFILESIZE=2000000
 
 # check the window size after each command and, if necessary,
 # update the values of LINES and COLUMNS.
@@ -99,15 +99,16 @@ alias ll='ls -alF'
 alias la='ls -A'
 alias l='ls -CF'
 
+COLOR_RAND=$(rand -M 999999)
+
 #aliases to avoid mouse usage
 alias poweroff='shutdown -h now'
 alias reboot='shutdown -r now' 
-alias lock='i3lock -c 000000 -n'
+alias lock='i3lock -c $COLOR_RAND'
+alias sros='source /opt/ros/kinetic/setup.bash'
 alias scrot='scrot ~/Pictures/%b%d::%H%M%S.png'
 alias cpu="grep 'cpu ' /proc/stat | awk '{usage=(\$2+\$4)*100/(\$2+\$4+\$5)} END {print usage}' | awk '{printf(\"%.1f\n\", \$1)}'"
 alias topcpu="/bin/ps -eo pcpu,pid,user,args | sort -k 1 -r | head -10"
-alias gogroot='cd /opt/groot'
-alias gobin='cd /opt/yujin/amd64'
 alias goros='cd /opt/ros'
 alias logs="sudo find /var/log -type f -exec file {} \; | grep 'text' | cut -d' ' -f1 | sed -e's/:$//g' | grep -v '[0-9]$' | xargs tail -f"
 
@@ -135,7 +136,6 @@ if ! shopt -oq posix; then
     . /etc/bash_completion
   fi
 fi
-[[ $- = *i* ]] && bind TAB:menu-complete
 
 
 #Automatically do an ls after each cd
@@ -385,8 +385,11 @@ function __setprompt
 	fi
 
 	# Date
-	PS1+="\[${DARKGRAY}\](\[${CYAN}\]\$(date +%a) $(date +%b-'%-m')" # Date
+	PS1+="\[${DARKGRAY}\](\[${CYAN}\]\$(date +%u) $(date +%D-'%-m')" # Date
 	PS1+="${LIGHTBLUE} $(date +'%-I':%M:%S%P)\[${DARKGRAY}\])-" # Time
+  
+  # Are we ROS
+  PS1+="$(echo $ROS_DISTRO)"
 
 	# CPU
 	PS1+="(\[${LIGHTMAGENTA}\]CPU $(cpu)%"
